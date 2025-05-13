@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-   return "DevOps update: auto-deploy working!"
+   return "🚀 This is the new CD test message!"
 
 
 if __name__ == '__main__':
