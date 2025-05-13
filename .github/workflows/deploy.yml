@@ -1,0 +1,23 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Connect to EC2 and deploy Docker container
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          docker stop flask-container || true
+          docker rm flask-container || true
+          docker pull abhirammanoj/flask-ecom:latest
+          docker run -d -p 80:5000 --name flask-container abhirammanoj/flask-ecom:latest
