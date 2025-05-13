@@ -1,4 +1,4 @@
-name: CD Pipeline
+name: Deploy to EC2
 
 on:
   push:
@@ -10,14 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Connect to EC2 and deploy Docker container
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        script: |
-          docker stop flask-container || true
-          docker rm flask-container || true
-          docker pull abhirammanoj/flask-ecom:latest
-          docker run -d -p 80:5000 --name flask-container abhirammanoj/flask-ecom:latest
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: SSH into EC2 and deploy Docker container
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} <<EOF
+          docker stop flaskapp || true
+          docker rm flaskapp || true
+          docker rmi abhirammanoj/flask-ecom || true
+          docker pull abhirammanoj/flask-ecom
+          docker run -d --name flaskapp -p 80:5000 abhirammanoj/flask-ecom
+        EOF
