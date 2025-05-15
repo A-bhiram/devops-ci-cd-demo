@@ -8,4 +8,4 @@ docker rm flask-container || true
 docker pull abhirammanoj/flask-ecom:latest
 
 # Run the updated container on port 80
-docker run -d --name flask-container -p 80:5000 abhirammanoj/flask-ecom:latest
+docker run -d --name flask-container -p 80:80 abhirammanoj/flask-ecom:latest
