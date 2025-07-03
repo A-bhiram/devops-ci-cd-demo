@@ -13,5 +13,23 @@ pipeline {
                 echo '🎉 Hello, Jenkins pipeline is working!'
             }
         }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh 'pylint *.py || true'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'pytest || true'
+            }
+        }
     }
 }
